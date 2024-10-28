@@ -1,6 +1,30 @@
 # HW
 
-urg: No
+# Project Stacks
+## AWS 리소스 구성
+- **EKS (Elastic Kubernetes Service)**: 백엔드가 배포된 쿠버네티스 클러스터 관리
+- **RDS (Relational Database Service)**: 프라이빗 서브넷에 MySQL 데이터베이스를 배포하여 백엔드 데이터를 안전하게 저장
+- **S3 및 CloudFront**: 프론트엔드 정적 사이트 호스팅 및 글로벌 배포를 위한 CDN 구성
+- **NAT 게이트웨이 및 인터넷 게이트웨이**: 프라이빗 서브넷 리소스가 인터넷에 접근할 수 있도록 네트워크 라우팅 설정
+- **IAM (Identity and Access Management)**: 리소스 접근을 위한 역할과 정책 구성
+
+## VPC 구성
+- **서브넷**: 퍼블릭 서브넷 2개와 프라이빗 서브넷 2개로 구성, RDS와 EKS 노드가 프라이빗 서브넷에 배치되어 보안을 강화
+- **NAT 및 인터넷 게이트웨이**: 퍼블릭 서브넷에서 NAT 게이트웨이를 통해 프라이빗 서브넷 리소스가 외부 인터넷에 접근 가능
+
+## IaC (Infrastructure as Code)
+- **도구**: Terraform을 사용하여 AWS 인프라를 코드로 관리 및 배포
+- **모듈화 구성**: VPC, EKS, RDS, S3 등 주요 리소스를 모듈로 구성하여 관리 용이성 확보
+
+## 쿠버네티스 (k8s)
+- **Helm 차트**: 배포 자동화를 위한 Helm 차트 사용
+- **오토스케일링 설정**: HorizontalPodAutoscaler(HPA)로 오토스케일링 구성 (초기 복제본 수 2개, 최소 1개, 최대 3개)
+
+## 모니터링 및 접근 보안
+- **Grafana 모니터링**: Helm으로 설치한 Grafana를 통해 클러스터 및 애플리케이션 상태를 모니터링
+- **Prometheus**: Node Exporter 사이드카를 사용하여 각 노드의 메트릭을 수집하고 모니터링
+- **OpenVPN**: Grafana와 Prometheus 대시보드에 안전하게 접근할 수 있도록 퍼블릭 서브넷에 OpenVPN 서버 설정
+  - **접근 방식**: 외부 사용자는 VPN을 통해 안전하게 접근 가능
 
 책 목록 CRUD기능을 구현하고, 이 비즈니스 로직이 동작하는 인프라 환경을 구현하는 MSA입니다. (프로젝트명 bookstore)
 
