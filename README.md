@@ -1,4 +1,4 @@
-# STC LABS과제
+# HW
 
 urg: No
 
