@@ -1,0 +1,27 @@
+replicaCount: 2
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+image:
+  repository: jhinha12/bookstore-backend
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+dbCredentials:
+  username: dXNlcjE= # base64 인코딩된 'user1'
+  password: MXEydzNlNHI= # base64 인코딩된 '1q2w3e4r'
+
+envConfig:
+  MYSQL_HOST: localhost
+  MYSQL_USER: root
+  MYSQL_PASSWORD: Wogusdla1!
+  MYSQL_DB: book_db
