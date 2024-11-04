@@ -23,5 +23,5 @@ dbCredentials:
 envConfig:
   MYSQL_HOST: localhost
   MYSQL_USER: root
-  MYSQL_PASSWORD: Wogusdla1!
+  MYSQL_PASSWORD: 1q2w3e4r
   MYSQL_DB: book_db
