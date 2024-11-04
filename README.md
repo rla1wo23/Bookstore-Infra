@@ -1,8 +1,33 @@
 # HW
 
-urg: No
+# Project Stacks
+## AWS 리소스 구성 with Terraform
+- **EKS (Elastic Kubernetes Service)**: 백엔드가 배포된 쿠버네티스 클러스터 관리
+- **RDS (Relational Database Service)**: 프라이빗 서브넷에 MySQL 데이터베이스를 배포
+- **S3 및 CloudFront**: 프론트엔드 정적 사이트 호스팅, CDN 
+- **NAT 게이트웨이 및 인터넷 게이트웨이**: 프라이빗 서브넷 리소스가 인터넷에 접근할 수 있도록 라우팅
+- **IAM**: 리소스 접근을 위한 역할과 정책 구성
 
-책 목록 CRUD기능을 구현하고, 이 비즈니스 로직이 동작하는 인프라 환경을 구현하는 MSA입니다. (프로젝트명 bookstore)
+## VPC 구성
+- **서브넷**: 퍼블릭 서브넷 2개와 프라이빗 서브넷 2개로 구성, RDS와 EKS 노드 프라이빗 서브넷에 배치
+- **NAT 및 인터넷 게이트웨이**: 퍼블릭 서브넷에서 NAT 게이트웨이를 통해 프라이빗 서브넷 리소스가 외부 인터넷에 접근 가능
+
+## IaC (Infrastructure as Code)
+- **도구**: Terraform 사용
+- **모듈화 구성**: VPC, EKS, RDS, S3 등 주요 리소스를 모듈로 구성, tfvars 최대한 활용하여 반복 자동화
+
+## 쿠버네티스 (k8s)
+- **Helm 차트**: Helm차트 이용했습니다.
+- **오토스케일링 설정**: HorizontalPodAutoscaler(HPA)로 오토스케일링 구성 (초기 복제본 수 2개, 최소 1개, 최대 3개)
+
+## 모니터링 및 접근 보안
+- **Grafana 모니터링**: 모니터링용 Grafana서버
+- **Prometheus**: Node Exporter 사이드카 배포, 각 노드의 메트릭을 수집
+- **OpenVPN**: Grafana와 Prometheus 대시보드에 접근하게끔 퍼블릭 서브넷에 OpenVPN 서버 설정. OpenVPN IAM이미지 사용했음.
+  - **접근 방식**: 외부 사용자가 VPN 클라이언트를 설치해서 OpenVPN서버에 연결하면 VOC에 접근 가능함
+
+## 프로젝트로 구현한 내용
+책 목록 CRUD기능을 구현하고, 이 비즈니스 로직이 동작하는 인프라 환경을 MSA로 구현했습니다. (프로젝트명 bookstore)
 
 ## 아키텍처
 
@@ -92,3 +117,15 @@ Mysql 기반의 RDS입니다.
 
 DB 스키마는 다음과 같습니다.
 id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255), author VARCHAR(255), price DECIMAL(10, 2)
+
+## 모니터링 (Prometheus 및 Grafana)
+
+---
+
+클러스터 상태와 애플리케이션 성능 모니터링을 위해 Prometheus와 Grafana를 구성했습니다. Prometheus는 쿠버네티스 파드 내 Node Exporter 사이드카에서 메트릭을 수집하고, Grafana 대시보드에서 이를 시각화해 성능을 분석합니다. 시스템 자원 사용량과 요청 처리량을 쉽게 확인할 수 있어 문제 발생 시 원인 분석에 효과적입니다. (실제로 Prometheus 설정 yaml을 작성하지는 않았으나, deployment를 보시면 사이드카를 배포하긴 했습니다.)
+
+## 보안 접근 (OpenVPN)
+
+---
+
+외부에서 안전하게 모니터링 대시보드에 접근할 수 있도록 OpenVPN을 퍼블릭 서브넷에 설정했습니다. 사용자는 OpenVPN클라이언트를 통해 프라이빗 네트워크에 접속해 Grafana와 Prometheus 대시보드에 접근할 수 있습니다. OpenVPN은 외부와 내부 네트워크 간 보안 터널을 제공하여 클러스터의 모니터링 시스템을 보호합니다. OpenVPN은 AWS marketplace의 이미지를 이용했습니다. 
